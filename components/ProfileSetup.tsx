@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { UserProfile, DietPlan } from '../types';
 import { calculateBMI, getBMICategory } from '../utils/helpers';
@@ -48,21 +47,27 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onProfileCreated }) 
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-100 dark:bg-zinc-900 p-4">
       <Card className="w-full max-w-md">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Welcome to SmartDiet</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2">Let's set up your profile to get started.</p>
+            <div className="mx-auto h-12 w-12 text-teal-500">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.503l1.23-2.257-1.23-2.257a.375.375 0 01.557-.503l5.603 3.113z" />
+                </svg>
+            </div>
+          <h1 className="text-3xl font-bold text-zinc-800 dark:text-white mt-4">Welcome to SmartDiet</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Let's set up your profile to get started.</p>
         </div>
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            <input type="text" name="name" placeholder="Your Name" onChange={handleChange} value={formData.name} className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required />
-            <input type="number" name="age" placeholder="Age" onChange={handleChange} value={formData.age} className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required />
-            <input type="number" name="height" placeholder="Height (cm)" onChange={handleChange} value={formData.height} className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required />
-            <input type="number" name="weight" placeholder="Weight (kg)" onChange={handleChange} value={formData.weight} className="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required />
+            <input type="text" name="name" placeholder="Your Name" onChange={handleChange} value={formData.name} className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 dark:text-white" required />
+            <input type="number" name="age" placeholder="Age" onChange={handleChange} value={formData.age} className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 dark:text-white" required />
+            <input type="number" name="height" placeholder="Height (cm)" onChange={handleChange} value={formData.height} className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 dark:text-white" required />
+            <input type="number" name="weight" placeholder="Weight (kg)" onChange={handleChange} value={formData.weight} className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 dark:text-white" required />
           </div>
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          <button type="submit" disabled={isLoading} className="w-full bg-emerald-500 text-white font-bold py-3 px-4 rounded-md hover:bg-emerald-600 transition duration-300 disabled:bg-emerald-300 flex items-center justify-center">
+          <button type="submit" disabled={isLoading} className="w-full bg-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-600 transition-all duration-300 disabled:bg-teal-300 flex items-center justify-center shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 transform hover:-translate-y-0.5">
             {isLoading ? <Spinner /> : 'Create Profile & Generate Plan'}
           </button>
         </form>
