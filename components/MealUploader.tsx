@@ -69,11 +69,14 @@ export const MealUploader: React.FC<MealUploaderProps> = ({ onMealAdd }) => {
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<MealAnalysis | null>(null);
   const [image, setImage] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processFile = async (file: File) => {
+    if (!file || !file.type.startsWith('image/')) {
+        setError("Please upload a valid image file.");
+        return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -89,6 +92,43 @@ export const MealUploader: React.FC<MealUploaderProps> = ({ onMealAdd }) => {
       setImage(null);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+  
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isLoading) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (isLoading) return;
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
     }
   };
 
@@ -116,17 +156,61 @@ export const MealUploader: React.FC<MealUploaderProps> = ({ onMealAdd }) => {
     }
   }
 
+  const triggerFileInput = () => {
+      if (!isLoading) {
+          fileInputRef.current?.click();
+      }
+  };
+
   return (
     <Card>
       <h2 className="text-2xl font-bold text-zinc-800 dark:text-white">Track a Meal</h2>
-      <p className="text-zinc-500 dark:text-zinc-400 mt-1">Upload a photo of your meal for AI analysis.</p>
-      <div className="mt-4">
-        <label htmlFor="file-upload" className="sr-only">Choose a file</label>
-        <input type="file" accept="image/*" onChange={handleFileChange} className="block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer" ref={fileInputRef} disabled={isLoading}/>
-      </div>
-      {isLoading && <div className="flex justify-center mt-6"><Spinner className="w-8 h-8"/></div>}
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-      {analysis && image && <AnalysisResult analysis={analysis} imageUrl={image} onConfirm={handleConfirm} onCancel={resetState} />}
+      <p className="text-zinc-500 dark:text-zinc-400 mt-1">Upload a photo for AI-powered analysis.</p>
+      
+      {analysis && image ? (
+          <AnalysisResult analysis={analysis} imageUrl={image} onConfirm={handleConfirm} onCancel={resetState} />
+      ) : isLoading ? (
+        <div className="flex flex-col items-center justify-center mt-6 h-48">
+            <Spinner className="w-10 h-10"/>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-3">Analyzing your meal...</p>
+        </div>
+      ) : error ? (
+         <div className="mt-6 text-center text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+            <p className="font-semibold">Oops! Something went wrong.</p>
+            <p className="text-sm">{error}</p>
+            <button onClick={resetState} className="mt-3 px-4 py-1.5 rounded-lg text-sm font-semibold text-zinc-700 dark:text-zinc-200 bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-300 dark:hover:bg-zinc-500 transition-colors">Try again</button>
+        </div>
+      ) : (
+          <div
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onClick={triggerFileInput}
+            className={`mt-6 p-8 border-2 border-dashed rounded-xl text-center cursor-pointer transition-colors duration-300 group ${isDragging ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20' : 'border-zinc-300 dark:border-zinc-600 hover:border-teal-400 dark:hover:border-teal-600'}`}
+            role="button"
+            aria-label="Upload meal image"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') triggerFileInput(); }}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              ref={fileInputRef}
+              disabled={isLoading}
+            />
+            <div className="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 mb-3 text-zinc-400 dark:text-zinc-500 group-hover:text-teal-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3" />
+              </svg>
+              <p className="font-semibold text-zinc-600 dark:text-zinc-300">Drag & drop an image here</p>
+              <p className="text-sm">or click to select a file</p>
+            </div>
+          </div>
+      )}
     </Card>
   );
 };
